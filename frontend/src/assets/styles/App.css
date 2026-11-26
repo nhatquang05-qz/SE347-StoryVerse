@@ -1,0 +1,51 @@
+#root {
+	max-width: none;
+	margin: 0;
+	padding: 0;
+	text-align: left;
+}
+
+.main-content {
+	flex-grow: 1;
+	max-width: 96rem;
+	margin: 0 auto;
+	padding: 2rem;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+@media (max-width: 48rem) {
+	.main-content {
+		padding: 1rem;
+	}
+}
+
+.main-content.reader-mode {
+	max-width: none;
+	padding: 0;
+}
+
+.app-container {
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+	background-color: var(--clr-background);
+}
+
+body.admin-cursor-mode,
+body.admin-cursor-mode * {
+	cursor: auto !important;
+}
+
+body.admin-cursor-mode a,
+body.admin-cursor-mode button,
+body.admin-cursor-mode input[type='submit'],
+body.admin-cursor-mode [role='button'],
+body.admin-cursor-mode .cursor-pointer {
+	cursor: pointer !important;
+}
+
+body.admin-cursor-mode input,
+body.admin-cursor-mode textarea {
+	cursor: text !important;
+}

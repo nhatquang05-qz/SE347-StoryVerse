@@ -1,0 +1,247 @@
+.top-comics-section {
+	height: auto;
+	background-color: var(--clr-card-bg);
+	border-radius: var(--border-radius);
+	margin-bottom: 2rem;
+	border: 1px solid var(--clr-border-light);
+	color: var(--clr-text);
+	padding: 1.5rem;
+	transition: all 0.3s ease;
+}
+
+.rank-container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.5rem;
+	margin-right: 0.625rem;
+	flex-shrink: 0;
+}
+
+.rank-comic-image {
+	width: 100%;
+	height: auto;
+	object-fit: contain;
+	animation: glowing-flame 2s infinite ease-in-out;
+}
+
+.section-title {
+	font-size: 1.5rem;
+	font-weight: 700;
+	margin: 0 0 0.25rem 0;
+	color: var(--clr-text);
+}
+
+.section-subtitle {
+	font-size: 0.9rem;
+	color: var(--clr-text-secondary);
+	margin: 0 0 1.5rem 0;
+}
+
+.tabs {
+	display: flex;
+	margin-bottom: 1.5rem;
+	border-bottom: 1px solid var(--clr-border-light);
+	overflow-x: auto;
+	scrollbar-width: none;
+}
+
+.tabs::-webkit-scrollbar {
+	display: none;
+}
+
+.tab-button {
+	background: none;
+	border: none;
+	padding: 0.8rem 1rem;
+	font-size: 1rem;
+	font-weight: 500;
+	color: var(--clr-text-secondary);
+	position: relative;
+	border-bottom: 3px solid transparent;
+	transition:
+		color 0.2s ease,
+		border-color 0.2s ease;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+.tab-button:hover {
+	color: var(--clr-primary);
+}
+
+.tab-button.active {
+	color: var(--clr-primary);
+	font-weight: 600;
+	border-bottom-color: var(--clr-primary);
+}
+
+.top-comics-list {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.top-comic-item {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.75rem;
+	text-decoration: none;
+	padding: 0.75rem;
+	border-radius: 0.375rem;
+	transition: background-color 0.2s ease;
+	color: var(--clr-text);
+}
+
+.top-comic-item:hover {
+	background-color: rgba(128, 128, 128, 0.1);
+}
+
+.rank-badge {
+	flex-shrink: 0;
+	width: 2.1875rem;
+	height: 2.1875rem;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: bold;
+	font-size: 1rem;
+	color: white;
+}
+
+.rank-badge:not(.rank-1):not(.rank-2):not(.rank-3) {
+	background-color: var(--clr-text-secondary);
+}
+
+.comic-thumbnail {
+	width: 3.125rem;
+	height: 4.6875rem;
+	object-fit: cover;
+	border-radius: 0.25rem;
+	flex-shrink: 0;
+	border: 1px solid var(--clr-border-light);
+}
+
+.comic-info {
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	height: 4.6875rem;
+	min-width: 0;
+}
+
+.comic-title {
+	font-size: 1rem;
+	font-weight: 600;
+	margin: 0;
+	color: var(--clr-text);
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	line-height: 1.3;
+}
+
+.comic-meta {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+	flex-wrap: nowrap;
+	width: 100%;
+	font-size: 0.85rem;
+	color: var(--clr-text-secondary);
+}
+
+.top-comic-item .star-rating-container {
+	font-size: 0.9em;
+	display: flex;
+	align-items: center;
+}
+.top-comic-item .star-rating-icons {
+	font-size: 0.9em;
+	display: flex;
+}
+.top-comic-item .star-icon {
+	width: 0.8rem;
+	height: 0.8rem;
+}
+.top-comic-item .rating-text {
+	font-size: 0.75rem;
+	white-space: nowrap;
+}
+
+.view-count {
+	white-space: nowrap;
+	font-size: 0.8rem;
+}
+
+.latest-chapter,
+.last-updated {
+	font-size: 0.8rem;
+	color: var(--clr-text-secondary);
+	margin: 0.2rem 0 0 0;
+}
+
+.current-date-indicator {
+	font-size: 0.85rem;
+	color: var(--clr-text-secondary);
+	margin: -1rem 0 1.5rem 0;
+	text-align: left;
+	position: relative;
+	top: -0.5rem;
+}
+
+@keyframes glowing-flame {
+	0% {
+		filter: drop-shadow(0 0 0.1875rem rgba(255, 223, 0, 0.7));
+	}
+	50% {
+		filter: drop-shadow(0 0 0.4375rem rgba(255, 191, 0, 1));
+	}
+	100% {
+		filter: drop-shadow(0 0 0.1875rem rgba(255, 223, 0, 0.7));
+	}
+}
+
+@media (max-width: 64rem) {
+	.top-comics-section {
+		padding: 1rem;
+	}
+}
+
+@media (max-width: 48rem) {
+	.top-comic-item {
+		gap: 0.75rem;
+		padding: 0.5rem;
+	}
+	.rank-container {
+		width: 1.75rem;
+		margin-right: 0.25rem;
+	}
+	.rank-badge {
+		width: 1.75rem;
+		height: 1.75rem;
+		font-size: 0.85rem;
+	}
+	.comic-thumbnail {
+		width: 2.75rem;
+		height: 4.125rem;
+	}
+	.comic-info {
+		height: 4.125rem;
+	}
+	.comic-title {
+		font-size: 0.95rem;
+	}
+	.comic-meta {
+		font-size: 0.75rem;
+	}
+	.tab-button {
+		padding: 0.6rem 0.8rem;
+		font-size: 0.9rem;
+	}
+}

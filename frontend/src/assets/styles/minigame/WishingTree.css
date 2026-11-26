@@ -1,0 +1,127 @@
+.tree-display-area {
+	position: absolute;
+	bottom: 15%;
+	left: 50%;
+	transform: translateX(-50%);
+
+	width: 100%;
+	max-width: 45rem;
+	height: 65vh;
+
+	display: flex;
+	justify-content: center;
+	align-items: flex-end;
+	z-index: 10;
+	margin-top: 0;
+}
+
+.main-tree-img {
+	width: auto;
+	height: 100%;
+	max-width: 100%;
+	object-fit: contain;
+	filter: drop-shadow(0 0 1.875rem rgba(255, 255, 255, 0.2));
+	transition: transform 0.3s ease;
+	transform-origin: bottom center;
+}
+
+.tree-display-area:hover .main-tree-img {
+	animation: scaleBounce 0.7s ease-in-out;
+}
+
+@keyframes scaleBounce {
+	0% {
+		transform: scale(1);
+	}
+	40% {
+		transform: scale(1.05);
+	}
+	70% {
+		transform: scale(0.95);
+	}
+	100% {
+		transform: scale(1);
+	}
+}
+
+.tree-decor {
+	position: absolute;
+	width: 3rem;
+	height: 3rem;
+	transition: transform 0.3s;
+	animation: glowPulse 2s infinite alternate;
+	z-index: 20;
+}
+
+.tree-decor:hover {
+	transform: scale(1.4);
+	z-index: 30;
+	cursor: pointer;
+}
+
+.decor-tooltip {
+	position: absolute;
+	bottom: 120%;
+	left: 50%;
+	transform: translateX(-50%);
+	background: rgba(255, 255, 255, 0.95);
+	color: #003366;
+	padding: 0.5rem 0.8rem;
+	border-radius: 0.5rem;
+	width: max-content;
+	max-width: 12rem;
+	text-align: center;
+	font-size: 0.8rem;
+	box-shadow: 0 0.3rem 1rem rgba(0, 0, 0, 0.3);
+	opacity: 0;
+	visibility: hidden;
+	transition: 0.2s;
+	pointer-events: none;
+	border: 1px solid #ffd700;
+}
+
+.tree-decor:hover .decor-tooltip {
+	opacity: 1;
+	visibility: visible;
+}
+
+.decor-user {
+	font-weight: bold;
+	display: block;
+	margin-bottom: 0.2rem;
+	color: #d35400;
+	font-size: 0.9rem;
+}
+
+@keyframes glowPulse {
+	0% {
+		filter: drop-shadow(0 0 0.125rem gold);
+		transform: scale(1);
+	}
+	100% {
+		filter: drop-shadow(0 0 0.5rem #ffeb3b);
+		transform: scale(1.1);
+	}
+}
+
+@media (max-width: 64rem) {
+	.tree-display-area {
+		height: 60vh;
+		bottom: 12%;
+		max-width: 35rem;
+	}
+}
+
+@media (max-width: 48rem) {
+	.tree-display-area {
+		width: 90%;
+		height: 55vh;
+		bottom: 15%;
+		max-width: none;
+	}
+
+	.tree-decor {
+		width: 2.2rem;
+		height: 2.2rem;
+	}
+}

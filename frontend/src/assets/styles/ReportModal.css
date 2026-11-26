@@ -1,0 +1,84 @@
+.modal-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.5);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 9999;
+}
+
+.report-modal {
+	background: var(--clr-card-bg);
+	padding: 1.25rem;
+	border-radius: 0.5rem;
+	width: 90%;
+	max-width: 25rem;
+	box-shadow: 0 0.25rem 0.9375rem rgba(0, 0, 0, 0.2);
+}
+
+.report-title {
+	font-size: 1.2rem;
+	font-weight: bold;
+	margin-bottom: 0.9375rem;
+	color: var(--clr-text);
+}
+
+.report-options {
+	color: var(--clr-text);
+}
+
+.modal-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 0.625rem;
+	margin-top: 1.25rem;
+}
+
+.btn-cancel {
+	padding: 0.5rem 1rem;
+	border: 0.0625rem solid var(--clr-border-light);
+	background: var(--clr-card-bg);
+	color: var(--clr-text);
+	border-radius: 0.25rem;
+	cursor: pointer;
+	transition: background-color 0.2s;
+}
+
+.btn-cancel:hover {
+	background-color: var(--clr-footer-bg);
+}
+
+.btn-confirm {
+	padding: 0.5rem 1rem;
+	background: rgb(226, 71, 71);
+	color: white;
+	border: none;
+	border-radius: 0.25rem;
+	cursor: pointer;
+	transition: background-color 0.2s;
+}
+
+.btn-confirm:hover {
+	background: rgb(255, 1, 1);
+}
+
+@media (max-width: 30rem) {
+	.report-modal {
+		width: 95%;
+		padding: 1rem;
+	}
+
+	.modal-actions {
+		flex-direction: column;
+	}
+
+	.btn-cancel,
+	.btn-confirm {
+		width: 100%;
+		justify-content: center;
+	}
+}

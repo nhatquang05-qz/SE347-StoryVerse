@@ -1,0 +1,195 @@
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
+// 1. Đổi tên import gốc để không bị trùng
+import FacebookLoginRaw from '@greatsumini/react-facebook-login';
+import { FaFacebook } from 'react-icons/fa';
+import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
+import '../assets/styles/AuthPage.css';
+import bgLogin from '../assets/images/bg-login.avif';
+
+const FACEBOOK_APP_ID = import.meta.env.VITE_FACEBOOK_APP_ID || '';
+
+const FacebookLogin = (FacebookLoginRaw as any).default || FacebookLoginRaw;
+const GoogleLoginComponent = (GoogleLogin as any).default || GoogleLogin;
+
+const LoginPage: React.FC = () => {
+	const [email, setEmail] = useState('');
+	const [password, setPassword] = useState('');
+	const {
+		login,
+		isLoginSuccessPopupOpen,
+		loginWithGoogle,
+		loginWithFacebook,
+		showLoginError,
+		closeLoginSuccessPopup,
+	} = useAuth();
+	const { showToast } = useToast();
+	const navigate = useNavigate();
+
+	useEffect(() => {
+		if (!FACEBOOK_APP_ID) {
+			console.error('Thiếu VITE_FACEBOOK_APP_ID trong file .env');
+		}
+	}, [showToast]);
+
+	const checkRoleAndRedirect = (user: any) => {
+		if (user && user.role === 'admin') {
+			navigate('/admin');
+		} else {
+			navigate('/');
+		}
+	};
+
+	const handlePostLogin = (user: any) => {
+		if (user) {
+			setTimeout(() => {
+				closeLoginSuccessPopup();
+				checkRoleAndRedirect(user);
+			}, 3000);
+		}
+	};
+
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+		if (isLoginSuccessPopupOpen) return;
+		try {
+			const user = await login(email, password);
+			handlePostLogin(user);
+		} catch (err) {
+			console.error('Lỗi đăng nhập:', err);
+		}
+	};
+
+	const handleGoogleLoginSuccess = async (credentialResponse: CredentialResponse) => {
+		if (isLoginSuccessPopupOpen) return;
+		try {
+			const user = await loginWithGoogle(credentialResponse);
+			handlePostLogin(user);
+		} catch (err) {
+			console.error('Lỗi đăng nhập Google:', err);
+			showToast('Lỗi kết nối hoặc xử lý đăng nhập Google.', 'error');
+		}
+	};
+
+	const handleGoogleLoginError = () => {
+		showLoginError('Lỗi đăng nhập Google', 'Đăng nhập Google thất bại. Vui lòng thử lại.');
+	};
+
+	const handleFacebookLoginSuccess = async (response: any) => {
+		if (isLoginSuccessPopupOpen) return;
+		if (response.accessToken) {
+			try {
+				const user = await loginWithFacebook(response.accessToken);
+				handlePostLogin(user);
+			} catch (err) {
+				console.error('Lỗi xử lý đăng nhập Facebook:', err);
+				showToast('Lỗi kết nối khi đăng nhập Facebook.', 'error');
+			}
+		} else {
+			showToast('Không nhận được Access Token từ Facebook.', 'error');
+		}
+	};
+
+	const handleFacebookLoginFail = (error: any) => {
+		console.error('Facebook Login Failed:', error);
+		showLoginError('Lỗi đăng nhập Facebook', 'Không thể kết nối với Facebook.');
+	};
+
+	return (
+		<div className="auth-page" style={{ backgroundImage: `url(${bgLogin})` }}>
+			<div className="auth-container">
+				<h2>Chào Mừng Trở Lại</h2>
+
+				<form className="auth-form" onSubmit={handleSubmit}>
+					<div className="form-group">
+						<label htmlFor="email">Email</label>
+						<input
+							type="email"
+							id="email"
+							value={email}
+							onChange={(e) => setEmail(e.target.value)}
+							required
+							placeholder="Nhập email của bạn"
+							disabled={isLoginSuccessPopupOpen}
+							autoComplete="email"
+						/>
+					</div>
+					<div className="form-group">
+						<label htmlFor="password">Mật Khẩu</label>
+						<input
+							type="password"
+							id="password"
+							value={password}
+							onChange={(e) => setPassword(e.target.value)}
+							required
+							placeholder="Nhập mật khẩu"
+							disabled={isLoginSuccessPopupOpen}
+							autoComplete="current-password"
+						/>
+					</div>
+
+					<div className="auth-options">
+						<Link to="/forgot-password">Quên mật khẩu?</Link>
+					</div>
+
+					<button
+						type="submit"
+						className="auth-button"
+						disabled={isLoginSuccessPopupOpen}
+					>
+						{isLoginSuccessPopupOpen ? 'Đang đăng nhập...' : 'Đăng Nhập'}
+					</button>
+				</form>
+
+				<div className="auth-divider">
+					<span>HOẶC</span>
+				</div>
+
+				<div className="social-login-group">
+					<div className="google-login-container" data-disabled={isLoginSuccessPopupOpen}>
+						{/* 3. Sử dụng component đã bọc */}
+						<GoogleLoginComponent
+							onSuccess={handleGoogleLoginSuccess}
+							onError={handleGoogleLoginError}
+							theme="filled_black"
+							size="large"
+							text="signin_with"
+							shape="pill"
+							locale="vi"
+							width="100%"
+						/>
+					</div>
+
+					{/* 4. Sử dụng component đã bọc */}
+					<FacebookLogin
+						appId={FACEBOOK_APP_ID}
+						scope="email"
+						onSuccess={handleFacebookLoginSuccess}
+						onFail={handleFacebookLoginFail}
+						style={{
+							width: '100%',
+						}}
+						render={({ onClick }: any) => (
+							<button
+								onClick={onClick}
+								className="facebook-btn"
+								disabled={isLoginSuccessPopupOpen}
+							>
+								<FaFacebook size={20} />
+								<span>Đăng nhập với Facebook</span>
+							</button>
+						)}
+					/>
+				</div>
+
+				<p className="auth-switch">
+					Chưa có tài khoản? <Link to="/register">Đăng ký ngay</Link>
+				</p>
+			</div>
+		</div>
+	);
+};
+
+export default LoginPage;
