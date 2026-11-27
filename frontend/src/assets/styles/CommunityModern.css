@@ -456,3 +456,11 @@ html[data-theme='night'] .comm-empty-state {
 		margin-top: 1rem;
 	}
 }
+.comm-filter-bar {
+	flex-wrap: wrap;
+	gap: 8px;
+}
+.comm-nav-btn.active {
+	color: var(--clr-primary);
+	background: color-mix(in srgb, var(--clr-primary) 12%, transparent);
+}

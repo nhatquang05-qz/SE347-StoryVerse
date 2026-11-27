@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { fetchComicCatalog } from '../../utils/comicCatalog';
 import { FiFilter, FiRotateCcw, FiStar } from 'react-icons/fi';
 import '../../assets/styles/FilterSidebar.css';
 
@@ -57,14 +58,8 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
 			})
 			.catch(() => setAllGenres([]));
 
-		fetch(`${API_URL}/comics?limit=1000`)
-			.then((res) => res.json())
-			.then((rawData) => {
-				let comicsArray: any[] = [];
-				if (Array.isArray(rawData)) comicsArray = rawData;
-				else if (rawData.data) comicsArray = rawData.data;
-				else if (rawData.comics) comicsArray = rawData.comics;
-
+		fetchComicCatalog(API_URL)
+			.then((comicsArray) => {
 				const uniqueAuthors = Array.from(
 					new Set(
 						comicsArray
@@ -97,7 +92,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
 	const handleRangeChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'min' | 'max') => {
 		const value = parseInt(e.target.value);
 		const minVal = filters.minPrice || 0;
-		const maxVal = filters.maxPrice || MAX_RANGE;
+		const maxVal = filters.maxPrice ?? MAX_RANGE;
 
 		if (type === 'min') {
 			if (value <= maxVal - MIN_GAP) onFilterChange({ ...filters, minPrice: value });
@@ -124,15 +119,15 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
 	};
 
 	const minPercent = ((filters.minPrice || 0) / MAX_RANGE) * 100;
-	const maxPercent = ((filters.maxPrice || MAX_RANGE) / MAX_RANGE) * 100;
+	const maxPercent = ((filters.maxPrice ?? MAX_RANGE) / MAX_RANGE) * 100;
 
 	const handleReset = () => {
 		onFilterChange({
 			authors: [],
 			genres: [],
 			mediaType: filters.mediaType,
-			minPrice: 0,
-			maxPrice: MAX_RANGE,
+			minPrice: undefined,
+			maxPrice: undefined,
 			ratingRange: [],
 		});
 		onSortChange(
@@ -167,7 +162,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
 			<div className="filter-sidebar-content">
 				<div className="sidebar-section">
 					<h3>Sắp xếp theo</h3>
-
+					
 					<div className="sidebar-subtitle">Thời gian</div>
 					<div className="sort-grid" style={{ marginBottom: '15px' }}>
 						<label className="sort-item">
@@ -347,14 +342,14 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
 									min="0"
 									max={MAX_RANGE}
 									step="50000"
-									value={filters.maxPrice || MAX_RANGE}
+									value={filters.maxPrice ?? MAX_RANGE}
 									onChange={(e) => handleRangeChange(e, 'max')}
 									className="range-input"
 								/>
 							</div>
 							<div className="price-values">
 								<span>{formatPrice(filters.minPrice || 0)}</span>
-								<span>{formatPrice(filters.maxPrice || MAX_RANGE)}</span>
+								<span>{formatPrice(filters.maxPrice ?? MAX_RANGE)}</span>
 							</div>
 						</div>
 					</div>

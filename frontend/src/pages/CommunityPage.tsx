@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import CreatePost from '../components/community/CreatePost';
@@ -9,7 +9,7 @@ import UserDetailModal from '../components/common/UserDetailModal';
 import ConfirmModal from '../components/popups/ConfirmModal';
 import CommunitySidebarLeft from '../components/community/CommunitySidebarLeft';
 import CommunitySidebarRight from '../components/community/CommunitySidebarRight';
-import { FiClock, FiTrendingUp, FiInbox } from 'react-icons/fi';
+import { FiClock, FiTrendingUp, FiInbox, FiHeart } from 'react-icons/fi';
 import type { Post } from '../types/community';
 import '../assets/styles/CommunityModern.css';
 
@@ -48,7 +48,10 @@ const CommunityPage: React.FC = () => {
 		parentId?: number;
 	} | null>(null);
 
-	const [feedFilter, setFeedFilter] = useState<'new' | 'hot'>('new');
+	const [feedFilter, setFeedFilter] = useState<'new' | 'activity'>('new');
+
+	const [likedOnly, setLikedOnly] = useState(false);
+	const pendingLikes = useRef(new Set<number>());
 
 	const handleUserClick = (userId: string) => {
 		setSelectedUserProfileId(userId);
@@ -149,7 +152,7 @@ const CommunityPage: React.FC = () => {
 			});
 			if (res.ok) {
 				const newPost = await res.json();
-				setPosts([newPost, ...posts]);
+				setPosts((prev) => [newPost, ...prev]);
 				setNewPostContent('');
 				setNewPostImage(null);
 				showToast('Đăng bài thành công!', 'success');
@@ -166,24 +169,31 @@ const CommunityPage: React.FC = () => {
 			openLoginRequest();
 			return;
 		}
-		const updatedPosts = posts.map((p) => {
-			if (p.id === post.id) {
-				return {
-					...p,
-					isLiked: !p.isLiked,
-					likeCount: p.isLiked ? p.likeCount - 1 : p.likeCount + 1,
-				};
-			}
-			return p;
-		});
-		setPosts(updatedPosts);
+		if (pendingLikes.current.has(post.id)) return;
+		pendingLikes.current.add(post.id);
 		try {
-			await fetch(`${API_URL}/posts/${post.id}/like`, {
+			const res = await fetch(`${API_URL}/posts/${post.id}/like`, {
 				method: 'POST',
 				headers: { Authorization: `Bearer ${token}` },
 			});
-		} catch (error) {
-			console.error(error);
+			if (!res.ok) throw new Error('Like failed');
+			const data = await res.json();
+			setPosts((prev) =>
+				prev.map((p) =>
+					p.id === post.id
+						? {
+								...p,
+								isLiked: data.isLiked,
+								likeCount: Number(data.likeCount),
+								lastActivityAt: data.lastActivityAt,
+							}
+						: p,
+				),
+			);
+		} catch {
+			showToast('Không thể cập nhật lượt thích. Vui lòng thử lại.', 'error');
+		} finally {
+			pendingLikes.current.delete(post.id);
 		}
 	};
 
@@ -301,6 +311,7 @@ const CommunityPage: React.FC = () => {
 							return {
 								...p,
 								commentCount: p.commentCount + 1,
+								lastActivityAt: newComment.createdAt,
 								comments: [...(p.comments || []), newComment],
 							};
 						}
@@ -387,25 +398,39 @@ const CommunityPage: React.FC = () => {
 		}
 	};
 
-	const sortedPosts = [...posts].sort((a, b) => {
-		if (feedFilter === 'hot') {
-			const scoreA = (a.likeCount || 0) + (a.commentCount || 0);
-			const scoreB = (b.likeCount || 0) + (b.commentCount || 0);
-			return scoreB - scoreA;
-		}
-
-		return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-	});
+	const sortedPosts = posts
+		.filter((p) => !likedOnly || (!!token && p.isLiked))
+		.sort((a, b) => {
+			const timeA = feedFilter === 'activity' ? a.lastActivityAt || a.createdAt : a.createdAt;
+			const timeB = feedFilter === 'activity' ? b.lastActivityAt || b.createdAt : b.createdAt;
+			return new Date(timeB).getTime() - new Date(timeA).getTime() || b.id - a.id;
+		});
 
 	return (
 		<div className="comm-layout">
 			{}
-			<CommunitySidebarLeft />
+			<CommunitySidebarLeft
+				likedOnly={likedOnly}
+				onToggleLiked={() => setLikedOnly((value) => !value)}
+			/>
 
 			{}
 			<main className="comm-feed">
 				{}
 				<div className="comm-filter-bar">
+					<button
+						className={`comm-filter-btn ${likedOnly ? 'active' : ''}`}
+						aria-pressed={likedOnly}
+						onClick={() => {
+							if (!token) {
+								openLoginRequest();
+								return;
+							}
+							setLikedOnly((value) => !value);
+						}}
+					>
+						<FiHeart /> {likedOnly ? 'Đã thích · Bỏ lọc' : 'Đã thích'}
+					</button>
 					<button
 						className={`comm-filter-btn ${feedFilter === 'new' ? 'active' : ''}`}
 						onClick={() => setFeedFilter('new')}
@@ -413,10 +438,10 @@ const CommunityPage: React.FC = () => {
 						<FiClock /> Mới Nhất
 					</button>
 					<button
-						className={`comm-filter-btn ${feedFilter === 'hot' ? 'active' : ''}`}
-						onClick={() => setFeedFilter('hot')}
+						className={`comm-filter-btn ${feedFilter === 'activity' ? 'active' : ''}`}
+						onClick={() => setFeedFilter('activity')}
 					>
-						<FiTrendingUp /> Phổ Biến
+						<FiTrendingUp /> Hoạt động gần đây
 					</button>
 				</div>
 
@@ -501,8 +526,14 @@ const CommunityPage: React.FC = () => {
 				) : (
 					<div className="comm-empty-state">
 						<FiInbox className="comm-empty-icon" />
-						<h3>Chưa có bài đăng nào.</h3>
-						<p>Hãy là người đầu tiên chia sẻ suy nghĩ của bạn!</p>
+						<h3>
+							{likedOnly ? 'Chưa có bài viết đã thích.' : 'Chưa có bài đăng nào.'}
+						</h3>
+						<p>
+							{likedOnly
+								? 'Các bài viết bạn thích sẽ xuất hiện ở đây.'
+								: 'Hãy là người đầu tiên chia sẻ suy nghĩ của bạn!'}
+						</p>
 					</div>
 				)}
 			</main>

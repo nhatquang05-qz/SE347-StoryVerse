@@ -183,7 +183,7 @@ function App() {
 				</Suspense>
 			</main>
 
-			{!isAdminPage && <Footer />}
+			{!isAdminPage && !isCommunityPage && <Footer />}
 
 			<FlyingImage
 				src={animationData.src}

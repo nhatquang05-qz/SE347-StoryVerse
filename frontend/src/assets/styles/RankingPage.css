@@ -72,7 +72,7 @@
 	left: 0;
 	right: 0;
 	bottom: 0;
-	background-image: url('../assets/images/sky-bg.webp');
+	background-image: url('../images/sky-bg.webp');
 	background-size: cover;
 	background-position: center;
 	opacity: 0.6;
@@ -673,5 +673,68 @@
 
 	.rp-grid {
 		grid-template-columns: 1fr;
+	}
+}
+.rp-wrapper .rp-hero {
+	height: auto;
+	min-height: 260px;
+	padding: 48px 20px;
+	border-bottom: 1px solid var(--clr-border-light);
+	box-shadow: none;
+	background: #17172d;
+}
+.rp-wrapper .rp-main-title {
+	font-family: var(--font-family-base);
+	font-size: clamp(2rem, 5vw, 3.4rem);
+	letter-spacing: -0.03em;
+	text-shadow: none;
+}
+.rp-wrapper .rp-section {
+	padding: clamp(20px, 3vw, 36px);
+	border: 1px solid var(--clr-border-light);
+	border-radius: 24px;
+	background: var(--clr-card-bg);
+}
+.rp-wrapper .rp-section-header {
+	flex-wrap: wrap;
+	gap: 12px;
+}
+.rp-wrapper .rp-section-title {
+	font-family: var(--font-family-base);
+	font-size: clamp(1.3rem, 3vw, 1.8rem);
+}
+.rp-wrapper .rp-tabs {
+	flex-wrap: wrap;
+	gap: 8px;
+}
+.rp-wrapper .rp-tab-btn {
+	border-radius: 10px;
+	padding: 10px 18px;
+}
+.rp-wrapper .rp-podium-card {
+	border-radius: 20px;
+	box-shadow: 0 8px 24px #0000000c;
+}
+.rp-wrapper .rp-grid-item {
+	border-radius: 14px;
+	box-shadow: none;
+	border: 1px solid var(--clr-border-light);
+	transition:
+		border-color 0.2s,
+		background 0.2s;
+}
+.rp-wrapper .rp-grid-item:hover {
+	border-color: var(--clr-primary);
+	background: color-mix(in srgb, var(--clr-primary) 5%, var(--clr-card-bg));
+}
+.rp-wrapper .rp-crown-icon {
+	animation: none;
+}
+@media (max-width: 600px) {
+	.rp-wrapper .rp-container {
+		padding: 0 12px;
+	}
+	.rp-wrapper .rp-podium {
+		gap: 16px;
 	}
 }

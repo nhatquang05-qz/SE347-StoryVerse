@@ -69,7 +69,38 @@ const WishlistPage: React.FC = () => {
 					<>
 						{filteredItems.length > 0 ? (
 							<div className="wl-grid">
-								<ProductList comics={filteredItems as any[]} />
+								{[true, false].map((digital) => {
+									const items = filteredItems.filter(
+										(item) =>
+											[true, 1, '1', 'true'].includes(item.isDigital) ===
+											digital,
+									);
+									return (
+										items.length > 0 && (
+											<section
+												key={String(digital)}
+												className={
+													digital
+														? 'wl-format-section online'
+														: 'wl-format-section physical'
+												}
+											>
+												<div className="wl-format-heading">
+													<h2>
+														{digital ? 'Đọc online' : 'Truyện giấy'}
+													</h2>
+													<span>{items.length} truyện</span>
+												</div>
+												<p>
+													{digital
+														? 'Những câu chuyện luôn bên bạn trên mọi thiết bị.'
+														: 'Bộ sưu tập dành cho những trang sách trên tay.'}
+												</p>
+												<ProductList comics={items} />
+											</section>
+										)
+									);
+								})}
 							</div>
 						) : (
 							<div className="wl-no-result">

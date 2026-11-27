@@ -45,11 +45,15 @@ const CheckoutPage: React.FC = () => {
 			showToast('Giỏ hàng trống', 'warning');
 			return;
 		}
-		if (!shippingInfo.address || !shippingInfo.phone) {
+		if (!shippingInfo.fullName.trim() || !shippingInfo.address.trim() || !shippingInfo.phone) {
 			showToast('Vui lòng nhập đầy đủ thông tin giao hàng', 'warning');
 			return;
 		}
 
+		if (!/^0[0-9]{9}$/.test(shippingInfo.phone)) {
+			showToast('Số điện thoại phải gồm 10 chữ số và bắt đầu bằng 0.', 'warning');
+			return;
+		}
 		setIsProcessing(true);
 
 		try {
@@ -130,7 +134,10 @@ const CheckoutPage: React.FC = () => {
 
 	return (
 		<div className="checkout-container">
-			<h1 className="checkout-title">Thanh Toán</h1>
+			<h1 className="checkout-title">Hoàn tất đơn hàng</h1>
+			<p className="checkout-subtitle">
+				Kiểm tra thông tin nhận hàng và chọn phương thức thanh toán phù hợp.
+			</p>
 
 			<div className="checkout-grid">
 				<div className="checkout-left">
@@ -153,12 +160,24 @@ const CheckoutPage: React.FC = () => {
 						<div className="form-group">
 							<label className="form-label">Số điện thoại</label>
 							<input
-								type="text"
+								type="number"
+								inputMode="numeric"
+								required
+								min="0"
+								step="1"
+								autoComplete="tel-national"
+								onKeyDown={(e) => {
+									if (['e', 'E', '+', '-', '.'].includes(e.key))
+										e.preventDefault();
+								}}
 								className="form-input"
 								placeholder="Nhập số điện thoại liên hệ"
 								value={shippingInfo.phone}
 								onChange={(e) =>
-									setShippingInfo({ ...shippingInfo, phone: e.target.value })
+									setShippingInfo({
+										...shippingInfo,
+										phone: e.target.value.replace(/[^0-9]/g, '').slice(0, 10),
+									})
 								}
 							/>
 						</div>

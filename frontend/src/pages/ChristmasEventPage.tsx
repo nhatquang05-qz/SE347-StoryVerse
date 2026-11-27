@@ -15,8 +15,20 @@ import { EventHistoryModal } from '../components/minigame/EventHistoryModal';
 const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
 const ChristmasEventPage: React.FC = () => {
-	const { currentUser, token, fetchUser } = useAuth();
+	const { currentUser, token, fetchUser, loading: authLoading } = useAuth();
 	const navigate = useNavigate();
+
+	useEffect(() => {
+		if (!authLoading && !currentUser) {
+			navigate('/login', {
+				replace: true,
+				state: {
+					from: '/christmas-event',
+					message: 'Vui lòng đăng nhập để tham gia sự kiện Giáng sinh.',
+				},
+			});
+		}
+	}, [authLoading, currentUser, navigate]);
 
 	const [showWheelModal, setShowWheelModal] = useState(false);
 	const [showRulesModal, setShowRulesModal] = useState(false);
@@ -80,7 +92,7 @@ const ChristmasEventPage: React.FC = () => {
 				console.error(error);
 			}
 		};
-		fetchData();
+		if (token) fetchData();
 	}, [token]);
 
 	const handleOpenGift = async () => {
@@ -152,6 +164,8 @@ const ChristmasEventPage: React.FC = () => {
 			setIsSending(false);
 		}
 	};
+
+	if (authLoading || !currentUser) return null;
 
 	return (
 		<div

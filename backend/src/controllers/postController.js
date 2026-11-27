@@ -14,6 +14,10 @@ const getPosts = async (req, res) => {
                 p.*, 
                 u.fullName as userName, 
                 u.avatarUrl as avatar,
+                GREATEST(p.createdAt,
+                    COALESCE((SELECT MAX(createdAt) FROM post_likes WHERE postId = p.id), p.createdAt),
+                    COALESCE((SELECT MAX(createdAt) FROM comments WHERE postId = p.id), p.createdAt)
+                ) as lastActivityAt,
                 (SELECT COUNT(*) FROM post_likes WHERE postId = p.id) as likeCount,
                 (SELECT COUNT(*) FROM comments WHERE postId = p.id) as commentCount,
                 (SELECT COUNT(*) FROM post_likes WHERE postId = p.id AND userId = ?) as isLiked
@@ -54,14 +58,24 @@ const toggleLike = async (req, res) => {
         const { id } = req.params; 
         const userId = req.userId;
         const connection = getConnection();
+        const likeResult = async (isLiked) => {
+            const [rows] = await connection.execute(`
+                SELECT (SELECT COUNT(*) FROM post_likes WHERE postId = p.id) AS likeCount,
+                    GREATEST(p.createdAt,
+                        COALESCE((SELECT MAX(createdAt) FROM post_likes WHERE postId = p.id), p.createdAt),
+                        COALESCE((SELECT MAX(createdAt) FROM comments WHERE postId = p.id), p.createdAt)
+                    ) AS lastActivityAt
+                FROM posts p WHERE p.id = ?`, [id]);
+            return { isLiked, ...rows[0] };
+        };
         const [check] = await connection.execute('SELECT id FROM post_likes WHERE postId = ? AND userId = ?', [id, userId]);
         
         if (check.length > 0) {
             await connection.execute('DELETE FROM post_likes WHERE postId = ? AND userId = ?', [id, userId]);
-            res.status(200).json({ message: 'Unliked', isLiked: false });
+            res.status(200).json(await likeResult(false));
         } else {
             await connection.execute('INSERT INTO post_likes (postId, userId) VALUES (?, ?)', [id, userId]);
-            res.status(200).json({ message: 'Liked', isLiked: true });
+            res.status(200).json(await likeResult(true));
 
             const [post] = await connection.execute('SELECT userId FROM posts WHERE id = ?', [id]);
             

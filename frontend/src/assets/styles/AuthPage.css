@@ -400,3 +400,18 @@
 .strength-label[data-score='4'] {
 	color: #00e676;
 }
+.auth-redirect-notice {
+	position: fixed;
+	top: calc(var(--header-height, 80px) + 16px);
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 10;
+	width: min(90%, 520px);
+	padding: 16px 20px;
+	border-radius: 12px;
+	background: var(--clr-card-bg);
+	color: var(--clr-text);
+	border: 1px solid var(--clr-primary);
+	box-shadow: 0 8px 30px #0002;
+	text-align: center;
+}

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { FiBookOpen, FiHeart } from 'react-icons/fi';
 import defaultAvatar from '../../assets/images/defaultAvatar.webp';
@@ -7,7 +8,10 @@ import '../../assets/styles/CommunityModern.css';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
-const CommunitySidebarLeft: React.FC = () => {
+const CommunitySidebarLeft: React.FC<{ likedOnly: boolean; onToggleLiked: () => void }> = ({
+	likedOnly,
+	onToggleLiked,
+}) => {
 	const { currentUser, token } = useAuth();
 	const [stats, setStats] = useState({ postCount: 0, totalLikes: 0 });
 
@@ -87,10 +91,14 @@ const CommunitySidebarLeft: React.FC = () => {
 			{}
 			<div className="comm-card" style={{ padding: '10px' }}>
 				<nav className="comm-nav-menu">
-					<button className="comm-nav-btn">
+					<Link to="/wishlist" className="comm-nav-btn">
 						<FiBookOpen /> Truyện đang theo dõi
-					</button>
-					<button className="comm-nav-btn">
+					</Link>
+					<button
+						className={`comm-nav-btn ${likedOnly ? 'active' : ''}`}
+						aria-pressed={likedOnly}
+						onClick={onToggleLiked}
+					>
 						<FiHeart /> Bài viết đã thích
 					</button>
 				</nav>

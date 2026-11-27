@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
 // 1. Đổi tên import gốc để không bị trùng
 import FacebookLoginRaw from '@greatsumini/react-facebook-login';
@@ -27,6 +27,7 @@ const LoginPage: React.FC = () => {
 	} = useAuth();
 	const { showToast } = useToast();
 	const navigate = useNavigate();
+	const location = useLocation();
 
 	useEffect(() => {
 		if (!FACEBOOK_APP_ID) {
@@ -38,7 +39,7 @@ const LoginPage: React.FC = () => {
 		if (user && user.role === 'admin') {
 			navigate('/admin');
 		} else {
-			navigate('/');
+			navigate(location.state?.from === '/christmas-event' ? '/christmas-event' : '/');
 		}
 	};
 
@@ -99,6 +100,11 @@ const LoginPage: React.FC = () => {
 
 	return (
 		<div className="auth-page" style={{ backgroundImage: `url(${bgLogin})` }}>
+			{location.state?.message && (
+				<p role="status" className="auth-redirect-notice">
+					{location.state.message}
+				</p>
+			)}
 			<div className="auth-container">
 				<h2>Chào Mừng Trở Lại</h2>
 

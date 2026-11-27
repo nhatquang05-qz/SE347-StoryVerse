@@ -14,6 +14,7 @@ export interface Comment {
 }
 
 export interface Post {
+	lastActivityAt?: string;
 	id: number;
 	userId: number;
 	userName: string;
